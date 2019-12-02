@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 public class PartTwo {
 
 	public static void main(String[] args) throws URISyntaxException, IOException {
-		Path inputPath = Paths.get(Thread.currentThread().getContextClassLoader().getResource("second/input.txt").toURI());
+		Path inputPath = Paths.get(Thread.currentThread().getContextClassLoader().getResource("first/input.txt").toURI());
 
 		try (Stream<String> moduleMassStream = Files.lines(inputPath)) {
 			moduleMassStream.map(Long::valueOf)
