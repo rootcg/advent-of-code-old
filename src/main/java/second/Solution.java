@@ -28,7 +28,7 @@ public class Solution {
 				memory.set(verbAddress, j);
 				runProgram();
 
-				if(memory.get(0) == 19690720) {
+				if (memory.get(0) == 19690720) {
 					noun = i;
 					verb = j;
 					break;
@@ -42,14 +42,14 @@ public class Solution {
 
 	private static void runProgram() {
 		int instructionPointer = 0;
-		for (;;) {
+		for (; ; ) {
 			int opcode = memory.get(instructionPointer);
 			if (opcode == 99)
 				break;
 
 			execute(opcode, memory.get(instructionPointer + 1),
-					memory.get(instructionPointer + 2),
-					memory.get(instructionPointer + 3));
+			        memory.get(instructionPointer + 2),
+			        memory.get(instructionPointer + 3));
 
 			instructionPointer += 4;
 		}
