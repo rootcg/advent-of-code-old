@@ -14,13 +14,14 @@ public class Solution {
 	private static final Pattern moreThanTwoAdjacent = Pattern.compile("(.)\\1{2}");
 
 	public static void main(String[] args) {
+		long time = System.currentTimeMillis();
 		long count = IntStream.range(first, last)
-							  .filter(number -> twoAdjacent(String.valueOf(number)))
 							  .filter(Solution::isIncreaseNumber)
-							  .peek(System.out::println)
+							  .filter(number -> twoAdjacent(String.valueOf(number)))
 							  .count();
 
 		System.out.println("Candidates: " + count);
+		System.out.println("Time: " + (System.currentTimeMillis() - time) + "ms");
 	}
 
 	private static boolean twoAdjacent(String text) {
