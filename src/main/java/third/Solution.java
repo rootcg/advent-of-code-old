@@ -10,7 +10,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class Third {
+public class Solution {
 
 	enum Direction {
 		U, R, D, L
