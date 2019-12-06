@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -32,10 +33,16 @@ public class Third {
 	static class Point {
 		final int x;
 		final int y;
+		final long steps;
 
 		Point(int x, int y) {
+			this(x, y, 0);
+		}
+
+		Point(int x, int y, long steps) {
 			this.x = x;
 			this.y = y;
+			this.steps = steps;
 		}
 
 		List<Point> move(Move move) {
@@ -44,19 +51,19 @@ public class Third {
 			switch (move.direction) {
 				case D:
 					for (int i = y - 1; i >= y - move.length; i--)
-						locationHistory.add(new Point(x, i));
+						locationHistory.add(new Point(x, i, steps + (y - i)));
 					break;
 				case U:
 					for (int i = y + 1; i <= y + move.length; i++)
-						locationHistory.add(new Point(x, i));
+						locationHistory.add(new Point(x, i, steps + (i - y)));
 					break;
 				case R:
 					for (int i = x + 1; i <= x + move.length; i++)
-						locationHistory.add(new Point(i, y));
+						locationHistory.add(new Point(i, y, steps + (i - x)));
 					break;
 				case L:
 					for (int i = x - 1; i >= x - move.length; i--)
-						locationHistory.add(new Point(i, y));
+						locationHistory.add(new Point(i, y, steps + (x - i)));
 					break;
 			}
 
@@ -79,9 +86,9 @@ public class Third {
 		@Override
 		public String toString() {
 			return "Point{" +
-			       "x=" + x +
-			       ", y=" + y +
-			       '}';
+				   "x=" + x +
+				   ", y=" + y +
+				   '}';
 		}
 	}
 
@@ -90,11 +97,27 @@ public class Third {
 		Set<Point> locationsWireA = trace(wireMoves.get(0));
 		Set<Point> locationsWireB = trace(wireMoves.get(1));
 
+		System.out.print("Minimum distance: ");
 		locationsWireA.stream()
-		              .filter(locationsWireB::contains)
-		              .map(point -> Math.abs(point.x) + Math.abs(point.y))
-		              .sorted()
-		              .forEach(System.out::println);
+					  .filter(locationsWireB::contains)
+					  .map(point -> Math.abs(point.x) + Math.abs(point.y))
+					  .sorted()
+					  .findFirst()
+					  .ifPresent(System.out::println);
+
+		// Transform to a Map bc the performance
+		Map<Point, Long> pointWithSteps = locationsWireB.stream().collect(Collectors.toMap(Function.identity(), p -> p.steps));
+
+		System.out.print("Minimum steps: ");
+		locationsWireA.stream()
+					  .map(point -> {
+						  long stepsB = pointWithSteps.getOrDefault(point, -1L);
+						  return stepsB > 0 ? point.steps + stepsB : -1;
+					  })
+					  .filter(steps -> steps > 0)
+					  .sorted()
+					  .findFirst()
+					  .ifPresent(System.out::println);
 	}
 
 	private static Set<Point> trace(List<Move> wireMoves) {
@@ -114,8 +137,8 @@ public class Third {
 		Path inputPath = Paths.get(Thread.currentThread().getContextClassLoader().getResource("third/input.txt").toURI());
 		try (Stream<String> rawInput = Files.lines(inputPath)) {
 			return rawInput.map(line -> Arrays.asList(line.split(",")))
-			               .map(moveList -> moveList.stream().map(Move::of).collect(Collectors.toList()))
-			               .collect(Collectors.toList());
+						   .map(moveList -> moveList.stream().map(Move::of).collect(Collectors.toList()))
+						   .collect(Collectors.toList());
 		}
 	}
 
