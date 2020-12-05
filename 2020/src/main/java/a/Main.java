@@ -28,4 +28,18 @@ public final class Main {
         throw new IllegalStateException("Number not found");
     }
 
+    final int second(final int[] numbers) {
+        for (int n : numbers) {
+            for (int m : numbers) {
+                for (int l : numbers) {
+                    if (n + m + l == 2020) {
+                        return n * m * l;
+                    }
+                }
+            }
+        }
+
+        throw new IllegalStateException("Number not found");
+    }
+
 }
