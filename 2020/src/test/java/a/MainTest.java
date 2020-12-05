@@ -46,7 +46,7 @@ class MainTest {
     }
 
     private int[] readInput() throws IOException {
-        return Files.lines(FilesUtilities.getResource("first"))
+        return Files.lines(FilesUtilities.getResource("a"))
                     .map(Integer::valueOf)
                     .mapToInt(Integer::intValue)
                     .toArray();
