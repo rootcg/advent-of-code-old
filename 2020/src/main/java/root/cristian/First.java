@@ -1,4 +1,4 @@
-package a;
+package root.cristian;
 
 /**
  * Specifically, they need you to find the two entries that sum to 2020 and then multiply those two numbers together.
@@ -15,7 +15,7 @@ package a;
  * In this list, the two entries that sum to 2020 are 1721 and 299.
  * Multiplying them together produces 1721 * 299 = 514579, so the correct answer is 514579.
  */
-public final class Main {
+public final class First {
 
     final int first(final int[] numbers) {
         for (int n : numbers) {

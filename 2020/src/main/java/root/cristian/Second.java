@@ -1,4 +1,4 @@
-package b;
+package root.cristian;
 
 import java.util.List;
 
@@ -13,7 +13,7 @@ import java.util.List;
  * <p/>
  * How many passwords are valid according to their policies?
  */
-public final class Main {
+public final class Second {
 
     final int first(final List<String> lines) {
         throw new IllegalStateException("Not implemented");
