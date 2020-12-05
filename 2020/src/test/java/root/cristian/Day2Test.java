@@ -9,13 +9,13 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.stream.Collectors;
 
-class SecondTest {
+class Day2Test {
 
     @Test
     final void exampleFirst() {
         final String[] lines = new String[]{"1-3 a: abcde", "1-3 b: cdefg", "2-9 c: ccccccccc"};
-        final Second second = new Second();
-        final int result = second.first(List.of(lines));
+        final Day2 day2 = new Day2();
+        final int result = day2.first(List.of(lines));
         Assertions.assertEquals(2, result);
     }
 

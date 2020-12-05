@@ -7,21 +7,21 @@ import utils.FilesUtilities;
 import java.io.IOException;
 import java.nio.file.Files;
 
-class FirstTest {
+class Day1Test {
 
     @Test
     final void exampleFirst() {
-        final First first = new First();
+        final Day1 day1 = new Day1();
         final int[] numbers = new int[]{1721, 979, 366, 299, 675, 1456};
-        final int result = first.first(numbers);
+        final int result = day1.first(numbers);
         Assertions.assertEquals(514579, result);
     }
 
     @Test
     final void exampleSecond() {
-        final First first = new First();
+        final Day1 day1 = new Day1();
         final int[] numbers = new int[]{1721, 979, 366, 299, 675, 1456};
-        final int result = first.second(numbers);
+        final int result = day1.second(numbers);
         Assertions.assertEquals(241861950, result);
     }
 
@@ -29,8 +29,8 @@ class FirstTest {
     final void first() throws IOException {
         final int[] numbers = readInput();
 
-        final First first = new First();
-        final int result = first.first(numbers);
+        final Day1 day1 = new Day1();
+        final int result = day1.first(numbers);
 
         System.out.println("Result is: " + result);
     }
@@ -39,14 +39,14 @@ class FirstTest {
     final void second() throws IOException {
         final int[] numbers = readInput();
 
-        final First first = new First();
-        final int result = first.second(numbers);
+        final Day1 day1 = new Day1();
+        final int result = day1.second(numbers);
 
         System.out.println("Result is: " + result);
     }
 
     private int[] readInput() throws IOException {
-        return Files.lines(FilesUtilities.getResource("a"))
+        return Files.lines(FilesUtilities.getResource("Day1"))
                     .map(Integer::valueOf)
                     .mapToInt(Integer::intValue)
                     .toArray();

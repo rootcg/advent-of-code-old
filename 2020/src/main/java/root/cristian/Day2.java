@@ -13,7 +13,7 @@ import java.util.List;
  * <p/>
  * How many passwords are valid according to their policies?
  */
-public final class Second {
+public final class Day2 {
 
     final int first(final List<String> lines) {
         throw new IllegalStateException("Not implemented");
