@@ -38,7 +38,10 @@ class Day3Test {
 
     @Test
     final void first() throws IOException {
-
+        final List<String> lines = readInput();
+        final Day3 day3 = new Day3();
+        final long result = day3.first(lines);
+        System.out.println("Result is: " + result);
     }
 
     @Test

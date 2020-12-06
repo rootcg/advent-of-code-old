@@ -1,6 +1,10 @@
 package root.cristian;
 
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * Due to the local geology, trees in this area only grow on exact integer coordinates in a grid. You make a map
@@ -42,12 +46,33 @@ import java.util.List;
  */
 public class Day3 {
 
-    final int first(final List<String> lines) {
-        throw new IllegalStateException("Not implemented");
+    private final record Point(int x, int y) {}
+
+    private static final char TREE = '#';
+
+    final long first(final List<String> lines) {
+        char[][] map = generateMap(lines);
+        Stream<Point> moves = Stream.iterate(new Point(0, 0), point -> new Point(point.x() + 3, point.y() + 1));
+
+        return moves.takeWhile(point -> point.y() < map.length && point.x() < map[point.y()].length)
+                    .filter(point -> map[point.y()][point.x()] == TREE)
+                    .count();
     }
 
     final int second(final List<String> lines) {
         throw new IllegalStateException("Not implemented");
+    }
+
+    private char[][] generateMap(final List<String> lines) {
+        final int requiredLength = 1 + lines.size() * 3;
+        final Function<String, char[]> scaleRow = (line) ->
+                IntStream.range(0, requiredLength / line.length())
+                         .flatMap(ignore -> line.chars())
+                         .mapToObj(Character::toString)
+                         .collect(Collectors.joining())
+                         .toCharArray();
+
+        return lines.stream().map(scaleRow).collect(Collectors.toList()).toArray(char[][]::new);
     }
 
 }
