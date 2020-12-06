@@ -24,7 +24,7 @@ public final class Day2 {
 
     private interface Policy {
 
-        boolean validate(String password);
+        boolean validate(final String password);
 
     }
 
@@ -34,14 +34,14 @@ public final class Day2 {
         private final int max;
         private final char letter;
 
-        public DeprecatedPolicy(int min, int max, char letter) {
+        public DeprecatedPolicy(final int min, final int max, final char letter) {
             this.min = min;
             this.max = max;
             this.letter = letter;
         }
 
         @Override
-        public boolean validate(String password) {
+        public boolean validate(final String password) {
             long letterCount = password.chars().filter(letter -> letter == this.letter).count();
             return letterCount >= min && letterCount <= max;
         }
@@ -53,13 +53,13 @@ public final class Day2 {
         private final int[] positions;
         private final char letter;
 
-        public UltraSecurePolicy(char letter, int... positions) {
+        public UltraSecurePolicy(final char letter, final int... positions) {
             this.letter = letter;
             this.positions = positions;
         }
 
         @Override
-        public boolean validate(String password) {
+        public boolean validate(final String password) {
             return Arrays.stream(positions).map(i -> --i).filter(i -> password.charAt(i) == letter).count() == 1;
         }
 
@@ -68,12 +68,12 @@ public final class Day2 {
     final long first(final List<String> lines) {
         int count = 0;
 
-        for (String line : lines) {
-            String[] attributes = line.split(":");
-            String password = attributes[1].strip();
-            String[] policyAttributes = attributes[0].split(" ");
-            String[] range = policyAttributes[0].split("-");
-            String letter = policyAttributes[1];
+        for (final String line : lines) {
+            final String[] attributes = line.split(":");
+            final String password = attributes[1].strip();
+            final String[] policyAttributes = attributes[0].split(" ");
+            final String[] range = policyAttributes[0].split("-");
+            final String letter = policyAttributes[1];
 
             Policy policy = new DeprecatedPolicy(
                     Integer.parseInt(range[0]),
@@ -91,14 +91,14 @@ public final class Day2 {
     final long second(final List<String> lines) {
         int count = 0;
 
-        for (String line : lines) {
-            String[] attributes = line.split(":");
-            String password = attributes[1].strip();
-            String[] policyAttributes = attributes[0].split(" ");
-            String[] range = policyAttributes[0].split("-");
-            String letter = policyAttributes[1];
+        for (final String line : lines) {
+            final String[] attributes = line.split(":");
+            final String password = attributes[1].strip();
+            final String[] policyAttributes = attributes[0].split(" ");
+            final String[] range = policyAttributes[0].split("-");
+            final String letter = policyAttributes[1];
 
-            Policy policy = new UltraSecurePolicy(letter.charAt(0),
+            final Policy policy = new UltraSecurePolicy(letter.charAt(0),
                     Arrays.stream(range).map(Integer::valueOf).mapToInt(Integer::intValue).toArray());
 
             if (policy.validate(password)) {

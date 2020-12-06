@@ -18,8 +18,8 @@ package root.cristian;
 public final class Day1 {
 
     final int first(final int[] numbers) {
-        for (int n : numbers) {
-            for (int m : numbers) {
+        for (final int n : numbers) {
+            for (final int m : numbers) {
                 if (n + m == 2020) {
                     return n * m;
                 }
@@ -30,9 +30,9 @@ public final class Day1 {
     }
 
     final int second(final int[] numbers) {
-        for (int n : numbers) {
-            for (int m : numbers) {
-                for (int l : numbers) {
+        for (final int n : numbers) {
+            for (final int m : numbers) {
+                for (final int l : numbers) {
                     if (n + m + l == 2020) {
                         return n * m * l;
                     }
