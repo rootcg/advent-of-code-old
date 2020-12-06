@@ -33,7 +33,22 @@ class Day3Test {
 
     @Test
     final void exampleSecond() {
+        final String lines = """
+                ..##.......
+                #...#...#..
+                .#....#..#.
+                ..#.#...#.#
+                .#...##..#.
+                ..#.##.....
+                .#.#.#....#
+                .#........#
+                #.##...#...
+                #...##....#
+                .#..#...#.#""";
 
+        final Day3 day3 = new Day3();
+        final long result = day3.second(lines.lines().collect(Collectors.toList()));
+        Assertions.assertEquals(336, result);
     }
 
     @Test
@@ -46,7 +61,10 @@ class Day3Test {
 
     @Test
     final void second() throws IOException {
-
+        final List<String> lines = readInput();
+        final Day3 day3 = new Day3();
+        final long result = day3.second(lines);
+        System.out.println("Result is: " + result);
     }
 
     private List<String> readInput() throws IOException {
