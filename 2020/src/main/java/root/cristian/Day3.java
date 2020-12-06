@@ -5,6 +5,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * --- Day 3: Toboggan Trajectory ---
+ */
 public class Day3 {
 
     private final record Point(int x, int y) {}
