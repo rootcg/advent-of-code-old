@@ -1,8 +1,15 @@
 package root.cristian;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
+ * For example, suppose you have the following list:
+ * <ul>
+ *      <li>1-3 a: abcde</li>
+ *      <li>1-3 b: cdefg</li>
+ *      <li>2-9 c: ccccccccc</li>
+ * </ul>
  * Each line gives the password policy and then the password. The password policy indicates the lowest and highest
  * number of times a given letter must appear for the password to be valid. For example, 1-3 a means that the password
  * must contain a at least 1 time and at most 3 times.
@@ -15,12 +22,91 @@ import java.util.List;
  */
 public final class Day2 {
 
-    final int first(final List<String> lines) {
-        throw new IllegalStateException("Not implemented");
+    private interface Policy {
+
+        boolean validate(String password);
+
     }
 
-    final int second(final List<String> lines) {
-        throw new IllegalStateException("Not implemented");
+    private static final class DeprecatedPolicy implements Policy {
+
+        private final int min;
+        private final int max;
+        private final char letter;
+
+        public DeprecatedPolicy(int min, int max, char letter) {
+            this.min = min;
+            this.max = max;
+            this.letter = letter;
+        }
+
+        @Override
+        public boolean validate(String password) {
+            long letterCount = password.chars().filter(letter -> letter == this.letter).count();
+            return letterCount >= min && letterCount <= max;
+        }
+
+    }
+
+    private static final class UltraSecurePolicy implements Policy {
+
+        private final int[] positions;
+        private final char letter;
+
+        public UltraSecurePolicy(char letter, int... positions) {
+            this.letter = letter;
+            this.positions = positions;
+        }
+
+        @Override
+        public boolean validate(String password) {
+            return Arrays.stream(positions).map(i -> --i).filter(i -> password.charAt(i) == letter).count() == 1;
+        }
+
+    }
+
+    final long first(final List<String> lines) {
+        int count = 0;
+
+        for (String line : lines) {
+            String[] attributes = line.split(":");
+            String password = attributes[1].strip();
+            String[] policyAttributes = attributes[0].split(" ");
+            String[] range = policyAttributes[0].split("-");
+            String letter = policyAttributes[1];
+
+            Policy policy = new DeprecatedPolicy(
+                    Integer.parseInt(range[0]),
+                    Integer.parseInt(range[1]),
+                    letter.charAt(0));
+
+            if (policy.validate(password)) {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    final long second(final List<String> lines) {
+        int count = 0;
+
+        for (String line : lines) {
+            String[] attributes = line.split(":");
+            String password = attributes[1].strip();
+            String[] policyAttributes = attributes[0].split(" ");
+            String[] range = policyAttributes[0].split("-");
+            String letter = policyAttributes[1];
+
+            Policy policy = new UltraSecurePolicy(letter.charAt(0),
+                    Arrays.stream(range).map(Integer::valueOf).mapToInt(Integer::intValue).toArray());
+
+            if (policy.validate(password)) {
+                count++;
+            }
+        }
+
+        return count;
     }
 
 }

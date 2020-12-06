@@ -28,20 +28,16 @@ class Day1Test {
     @Test
     final void first() throws IOException {
         final int[] numbers = readInput();
-
         final Day1 day1 = new Day1();
         final int result = day1.first(numbers);
-
         System.out.println("Result is: " + result);
     }
 
     @Test
     final void second() throws IOException {
         final int[] numbers = readInput();
-
         final Day1 day1 = new Day1();
         final int result = day1.second(numbers);
-
         System.out.println("Result is: " + result);
     }
 
