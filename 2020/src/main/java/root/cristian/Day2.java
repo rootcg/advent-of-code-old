@@ -13,13 +13,11 @@ public final class Day2 {
     }
 
     private static final record DeprecatedPolicy(int min, int max, char letter) implements Policy {
-
         @Override
         public boolean validate(final String password) {
             long letterCount = password.chars().filter(letter -> letter == this.letter).count();
             return letterCount >= min && letterCount <= max;
         }
-
     }
 
     private static final record UltraSecurePolicy(char letter, int... positions) implements Policy {
