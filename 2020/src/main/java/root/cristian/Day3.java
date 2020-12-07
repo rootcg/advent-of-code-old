@@ -28,10 +28,9 @@ public class Day3 {
         }
 
         private Point calculateRelativePoint(final Point point) {
-            if (point.x() >= map[point.y()].length)
-                return calculateRelativePoint(new Point(point.x() - map[point.y()].length, point.y()));
-            else
-                return point;
+            final int slices = point.x() / map[point.y()].length;
+            final int relativeX = point.x() - (slices * map[point.y()].length);
+            return new Point(relativeX, point.y());
         }
 
         final int height() {
