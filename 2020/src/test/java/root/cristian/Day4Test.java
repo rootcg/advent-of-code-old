@@ -28,7 +28,7 @@ class Day4Test {
                 hcl:#cfa07d eyr:2025 pid:166559648
                 iyr:2011 ecl:brn hgt:59in""";
 
-        final Day3 day4 = new Day3();
+        final Day4 day4 = new Day4();
         final long result = day4.first(data.lines().collect(Collectors.toList()));
         Assertions.assertEquals(2, result);
     }
