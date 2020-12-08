@@ -185,7 +185,7 @@ public class Day4 {
                 .count();
     }
 
-    private List<String> parsePassportList(List<String> rawPassports) {
+    private List<String> parsePassportList(final List<String> rawPassports) {
         final BiFunction<LinkedList<List<String>>, String, LinkedList<List<String>>> accumulator =
                 (linkedList, line) -> {
                     if (line.isBlank()) {
