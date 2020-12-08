@@ -7,6 +7,11 @@ import java.util.List;
  */
 public class Day5 {
 
+    private final static record Bounds(int frontRows, int backRows, int leftColumns, int rightColumns) {}
+
+    private static final int ROWS = 128;
+    private static final int COLUMS = 8;
+
     /**
      * You board your plane only to discover a new problem: you dropped your boarding pass! You aren't sure which seat
      * is yours, and all of the flight attendants are busy with the flood of people that suddenly made it through
@@ -63,11 +68,25 @@ public class Day5 {
      * @return the highest seat ID
      */
     final int first(final List<String> lines) {
-        throw new IllegalStateException("Not implemented");
+        return lines.stream()
+                    .map(address -> address.chars().boxed().reduce(new Bounds(0, ROWS, 0, COLUMS), this::decode, (a, b) -> b))
+                    .mapToInt(bounds -> bounds.frontRows() * 8 + bounds.leftColumns())
+                    .max()
+                    .orElseThrow(IllegalStateException::new);
     }
 
     final int second(final List<String> lines) {
         throw new IllegalStateException("Not implemented");
+    }
+
+    private Bounds decode(final Bounds bounds, final int direction) {
+        return switch (direction) {
+            case 'F' -> new Bounds(bounds.frontRows(), bounds.backRows() - (bounds.backRows() - bounds.frontRows()) / 2, bounds.leftColumns(), bounds.rightColumns());
+            case 'B' -> new Bounds(bounds.frontRows() + (bounds.backRows() - bounds.frontRows()) / 2, bounds.backRows(), bounds.leftColumns(), bounds.rightColumns());
+            case 'L' -> new Bounds(bounds.frontRows(), bounds.backRows(), bounds.leftColumns(), bounds.rightColumns() - (bounds.rightColumns() - bounds.leftColumns()) / 2);
+            case 'R' -> new Bounds(bounds.frontRows(), bounds.backRows(), bounds.leftColumns() + (bounds.rightColumns() - bounds.leftColumns()) / 2, bounds.rightColumns());
+            default -> throw new IllegalStateException("Unknown direction");
+        };
     }
 
 }
