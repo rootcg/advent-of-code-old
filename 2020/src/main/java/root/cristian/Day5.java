@@ -10,7 +10,7 @@ public class Day5 {
     private final static record Bounds(int frontRows, int backRows, int leftColumns, int rightColumns) {}
 
     private static final int ROWS = 128;
-    private static final int COLUMS = 8;
+    private static final int COLUMNS = 8;
 
     /**
      * You board your plane only to discover a new problem: you dropped your boarding pass! You aren't sure which seat
@@ -69,14 +69,19 @@ public class Day5 {
      */
     final int first(final List<String> lines) {
         return lines.stream()
-                    .map(address -> address.chars().boxed().reduce(new Bounds(0, ROWS, 0, COLUMS), this::decode, (a, b) -> b))
+                    .map(address -> address.chars().boxed().reduce(new Bounds(0, ROWS, 0, COLUMNS), this::decode, (a, b) -> b))
                     .mapToInt(bounds -> bounds.frontRows() * 8 + bounds.leftColumns())
                     .max()
                     .orElseThrow(IllegalStateException::new);
     }
 
     final int second(final List<String> lines) {
-        throw new IllegalStateException("Not implemented");
+        return 1 + lines.stream()
+                        .map(address -> address.chars().boxed().reduce(new Bounds(0, ROWS, 0, COLUMNS), this::decode, (a, b) -> b))
+                        .mapToInt(bounds -> bounds.frontRows() * 8 + bounds.leftColumns())
+                        .sorted()
+                        .reduce((a, b) -> a + 1 == b ? b : a)
+                        .orElseThrow(IllegalStateException::new);
     }
 
     private Bounds decode(final Bounds bounds, final int direction) {

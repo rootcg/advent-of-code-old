@@ -24,7 +24,7 @@ class Day5Test {
 
     @Test
     final void exampleSecond() {
-
+        // There is no example
     }
 
     @Test
