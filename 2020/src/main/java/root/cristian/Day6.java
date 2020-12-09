@@ -2,7 +2,10 @@ package root.cristian;
 
 import root.cristian.utilities.SplitterCollector;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.function.BinaryOperator;
+import java.util.stream.Collectors;
 
 /**
  * --- Day 6: Custom Customs ---
@@ -61,6 +64,9 @@ public class Day6 {
      * In this example, the sum of these counts is 3 + 3 + 3 + 1 + 1 = 11.
      * <p/>
      * For each group, count the number of questions to which anyone answered "yes". What is the sum of those counts?
+     *
+     * @param lines containing the answers
+     * @return sum of distinct answers by group
      */
     final long first(final List<String> lines) {
         return lines.stream()
@@ -70,8 +76,60 @@ public class Day6 {
                     .sum();
     }
 
+    /**
+     * As you finish the last group's customs declaration, you notice that you misread one word in the instructions:
+     * <p/>
+     * You don't need to identify the questions to which anyone answered "yes"; you need to identify the questions to
+     * which everyone answered "yes"!
+     * <p/>
+     * Using the same example as above:
+     * <pre>
+     * abc
+     *
+     * a
+     * b
+     * c
+     *
+     * ab
+     * ac
+     *
+     * a
+     * a
+     * a
+     * a
+     *
+     * b
+     * </pre>
+     * This list represents answers from five groups:
+     * <ul>
+     *     <li>In the first group, everyone (all 1 person) answered "yes" to 3 questions: a, b, and c.</li>
+     *     <li>In the second group, there is no question to which everyone answered "yes".</li>
+     *     <li>In the third group, everyone answered yes to only 1 question, a. Since some people did not answer "yes" to b or c, they don't count.</li>
+     *     <li>In the fourth group, everyone answered yes to only 1 question, a.</li>
+     *     <li>In the fifth group, everyone (all 1 person) answered "yes" to 1 question, b.</li>
+     *     <li>In this example, the sum of these counts is 3 + 0 + 1 + 1 + 1 = 6.</li>
+     * </ul>
+     * For each group, count the number of questions to which everyone answered "yes". What is the sum of those counts?
+     *
+     * @param lines containing the answers
+     * @return sum of answers which everyone answered yes by group
+     */
     final long second(final List<String> lines) {
-        throw new IllegalStateException("Not implemented");
+        final BinaryOperator<List<Integer>> intersect = (a, b) -> {
+            a.retainAll(b);
+            return a;
+        };
+
+        return lines.stream()
+                    .collect(SplitterCollector.splitBy(String::isBlank))
+                    .stream()
+                    .map(groupAnswers -> groupAnswers.stream()
+                                                     .map(String::chars)
+                                                     .map(answers -> answers.boxed().collect(Collectors.toList()))
+                                                     .reduce(intersect)
+                                                     .orElse(Collections.emptyList()))
+                    .mapToLong(List::size)
+                    .sum();
     }
 
 }

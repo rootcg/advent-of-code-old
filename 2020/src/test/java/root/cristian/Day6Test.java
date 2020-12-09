@@ -37,7 +37,26 @@ class Day6Test {
 
     @Test
     final void exampleSecond() {
+        final String data = """
+                abc
+                                
+                a
+                b
+                c
+                                
+                ab
+                ac
+                                
+                a
+                a
+                a
+                a
+                                
+                b""";
 
+        final Day6 day6 = new Day6();
+        final long result = day6.second(data.lines().collect(Collectors.toList()));
+        Assertions.assertEquals(6, result);
     }
 
     @Test
