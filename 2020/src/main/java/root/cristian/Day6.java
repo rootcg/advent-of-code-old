@@ -1,5 +1,7 @@
 package root.cristian;
 
+import root.cristian.utilities.SplitterCollector;
+
 import java.util.List;
 
 /**
@@ -61,7 +63,11 @@ public class Day6 {
      * For each group, count the number of questions to which anyone answered "yes". What is the sum of those counts?
      */
     final long first(final List<String> lines) {
-        throw new IllegalStateException("Not implemented");
+        return lines.stream()
+                    .collect(SplitterCollector.splitBy(String::isBlank))
+                    .stream()
+                    .mapToLong(groupAnswers -> groupAnswers.stream().flatMapToInt(String::chars).distinct().count())
+                    .sum();
     }
 
     final long second(final List<String> lines) {

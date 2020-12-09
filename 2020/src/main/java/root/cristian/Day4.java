@@ -1,7 +1,9 @@
 package root.cristian;
 
-import java.util.*;
-import java.util.function.BiFunction;
+import root.cristian.utilities.SplitterCollector;
+
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -186,20 +188,8 @@ public class Day4 {
     }
 
     private List<String> parsePassportList(final List<String> rawPassports) {
-        final BiFunction<LinkedList<List<String>>, String, LinkedList<List<String>>> accumulator =
-                (linkedList, line) -> {
-                    if (line.isBlank()) {
-                        linkedList.add(new ArrayList<>());
-                    } else {
-                        linkedList.getLast().add(line);
-                    }
-
-                    return linkedList;
-                };
-
         return rawPassports.stream()
-                           .reduce(new LinkedList<>(Collections.<List<String>>singletonList(new ArrayList<>())),
-                                   accumulator, (a, b) -> b)
+                           .collect(SplitterCollector.splitBy(String::isBlank))
                            .stream()
                            .map(passport -> String.join(" ", passport))
                            .collect(Collectors.toList());
