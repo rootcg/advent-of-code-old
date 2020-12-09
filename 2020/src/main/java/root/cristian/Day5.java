@@ -75,6 +75,20 @@ public class Day5 {
                     .orElseThrow(IllegalStateException::new);
     }
 
+    /**
+     * Ding! The "fasten seat belt" signs have turned on. Time to find your seat.
+     * <p/>
+     * It's a completely full flight, so your seat should be the only missing boarding pass in your list. However,
+     * here's a catch: some of the seats at the very front and back of the plane don't exist on this aircraft, so
+     * they'll be missing from your list as well.
+     * <p/>
+     * Your seat wasn't at the very front or back, though; the seats with IDs +1 and -1 from yours will be in your list.
+     * <p/>
+     * What is the ID of your seat?
+     *
+     * @param lines seat addresses
+     * @return your seat ID
+     */
     final int second(final List<String> lines) {
         return 1 + lines.stream()
                         .map(address -> address.chars().boxed().reduce(new Bounds(0, ROWS, 0, COLUMNS), this::decode, (a, b) -> b))
