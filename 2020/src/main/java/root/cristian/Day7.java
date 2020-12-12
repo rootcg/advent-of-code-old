@@ -56,7 +56,7 @@ public class Day7 {
      * sure you get all of it.)
      *
      * @param lines containing luggage rules
-     * @return number of bags can hold the shiny gold one
+     * @return number of bags that can hold the shiny gold one
      */
     final long first(final List<String> lines) {
         final BiConsumer<Map<String, Set<String>>, Matcher> luggageAccumulator = (map, matcher) -> {
@@ -84,6 +84,39 @@ public class Day7 {
         return recursiveLookup("shiny gold", bags, Collectors.toSet()).size();
     }
 
+    /**
+     * It's getting pretty expensive to fly these days - not because of ticket prices, but because of the ridiculous
+     * number of bags you need to buy!
+     * <p/>
+     * Consider again your shiny gold bag and the rules from the above example:
+     * <pre>
+     * faded blue bags contain 0 other bags.
+     * dotted black bags contain 0 other bags.
+     * vibrant plum bags contain 11 other bags: 5 faded blue bags and 6 dotted black bags.
+     * dark olive bags contain 7 other bags: 3 faded blue bags and 4 dotted black bags.
+     * So, a single shiny gold bag must contain 1 dark olive bag (and the 7 bags within it) plus 2 vibrant plum bags
+     * (and the 11 bags within each of those): 1 + 1*7 + 2 + 2*11 = 32 bags!
+     * </pre>
+     * Of course, the actual rules have a small chance of going several levels deeper than this example; be sure to
+     * count all of the bags, even if the nesting becomes topologically impractical!
+     * <p/>
+     * Here's another example:
+     * <pre>
+     * shiny gold bags contain 2 dark red bags.
+     * dark red bags contain 2 dark orange bags.
+     * dark orange bags contain 2 dark yellow bags.
+     * dark yellow bags contain 2 dark green bags.
+     * dark green bags contain 2 dark blue bags.
+     * dark blue bags contain 2 dark violet bags.
+     * dark violet bags contain no other bags.
+     * </pre>
+     * In this example, a single shiny gold bag must contain 126 other bags.
+     * <p/>
+     * How many individual bags are required inside your single shiny gold bag?
+     *
+     * @param lines containing luggage rules
+     * @return number of bags that the shiny gold bag contains
+     */
     final long second(final List<String> lines) {
         final Map<String, List<String>> bags =
                 lines.stream()
@@ -102,8 +135,8 @@ public class Day7 {
     }
 
     private Collection<String> recursiveLookup(final String target,
-                                        final Map<String, ? extends Collection<String>> bags,
-                                        final Collector<String, ?, ? extends Collection<String>> collector) {
+                                               final Map<String, ? extends Collection<String>> bags,
+                                               final Collector<String, ?, ? extends Collection<String>> collector) {
         final Collection<String> containers = bags.get(target) == null ? Collections.emptyList() : bags.get(target);
         return Stream.concat(containers.stream(),
                              containers.stream()
