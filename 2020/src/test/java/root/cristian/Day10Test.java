@@ -14,41 +14,21 @@ class Day10Test {
     @Test
     final void exampleFirst() {
         final String data = """
-                28
-                33
-                18
-                42
-                31
-                14
-                46
-                20
-                48
-                47
-                24
-                23
-                49
-                45
-                19
-                38
-                39
-                11
-                1
-                32
-                25
-                35
-                8
-                17
-                7
-                9
-                4
-                2
-                34
+                16
                 10
-                3""";
+                15
+                5
+                1
+                11
+                7
+                19
+                6
+                12
+                4""";
 
         final Day10 day10 = new Day10();
-        final long result = day10.first(data.lines().collect(Collectors.toList()), 5);
-        Assertions.assertEquals(220, result);
+        final long result = day10.first(data.lines().collect(Collectors.toList()));
+        Assertions.assertEquals(35, result);
     }
 
     @Test
@@ -60,7 +40,7 @@ class Day10Test {
     final void first() throws IOException {
         final List<String> data = readInput();
         final Day10 day10 = new Day10();
-        final long result = day10.first(data, 25);
+        final long result = day10.first(data);
         System.out.println("Result is: " + result);
     }
 

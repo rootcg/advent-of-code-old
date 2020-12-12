@@ -1,6 +1,8 @@
 package root.cristian;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * --- Day 9: Adapter Array ---
@@ -112,7 +114,23 @@ public class Day10 {
      * @return product of 1-jolt differences and 3-jolt differences
      */
     final long first(final List<String> lines) {
-        throw new IllegalStateException();
+        final List<Long> adapters = lines.stream()
+                                         .map(Long::valueOf)
+                                         .sorted(Comparator.comparingLong(Long::longValue).reversed())
+                                         .collect(Collectors.toList());
+
+        long oneJoltDifferences = adapters.get(adapters.size() - 1); // first adapter to plug-in
+        long threeJoltDifferences = 1; // because built in adapter
+        for (int i = 0; i < adapters.size() - 1; i++) {
+            final long diff = adapters.get(i) - adapters.get(i + 1);
+            if(diff == 1) {
+                oneJoltDifferences++;
+            } else if(diff == 3) {
+                threeJoltDifferences++;
+            }
+        }
+
+        return oneJoltDifferences * threeJoltDifferences;
     }
 
     final long second(final List<String> lines) {
