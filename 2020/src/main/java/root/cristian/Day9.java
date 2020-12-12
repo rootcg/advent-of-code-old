@@ -1,11 +1,31 @@
 package root.cristian;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * --- Day 9: Encoding Error ---
  */
 public class Day9 {
+
+    public static class LimitedQueue<E> extends LinkedList<E> {
+        private final int limit;
+
+        public LimitedQueue(int limit) {
+            this.limit = limit;
+        }
+
+        @Override
+        public boolean add(E o) {
+            boolean added = super.add(o);
+            while (added && size() > limit) { super.remove(); }
+            return added;
+        }
+    }
 
     /**
      * With your neighbor happily enjoying their video game, you turn your attention to an open data port on the little
@@ -68,15 +88,96 @@ public class Day9 {
      * preamble) which is not the sum of two of the 25 numbers before it. What is the first number that does not have
      * this property?
      *
-     * @param lines encrypted data
+     * @param lines    encrypted data
+     * @param preamble XMAS preamble
      * @return first number that doesn't hold to the XMAS specification
      */
-    final long first(final List<String> lines) {
-        throw new IllegalStateException();
+    final long first(final List<String> lines, final int preamble) {
+        final List<Long> previousNumbers = new LimitedQueue<>(preamble);
+        final List<Long> numbers = lines.stream().map(Long::parseLong).collect(Collectors.toList());
+
+        final Predicate<Long> isValid = (number) -> {
+            for (int i = 0; i < previousNumbers.size() - 1; i++) {
+                for (int j = 0; j < previousNumbers.size(); j++) {
+                    if (j == i) continue;
+                    if (previousNumbers.get(i) + previousNumbers.get(j) == number) return true;
+                }
+            }
+
+            return false;
+        };
+
+        numbers.stream().limit(preamble).forEach(previousNumbers::add);
+        for (Long number : numbers.stream().skip(preamble).collect(Collectors.toList())) {
+            if (!isValid.test(number)) return number;
+            else previousNumbers.add(number);
+        }
+
+        throw new IllegalStateException("All numbers are correct");
     }
 
-    final long second(final List<String> lines) {
-        throw new IllegalStateException();
+    /**
+     * The final step in breaking the XMAS encryption relies on the invalid number you just found: you must find a
+     * contiguous set of at least two numbers in your list which sum to the invalid number from step 1.
+     * <p/>
+     * Again consider the above example:
+     * <pre>
+     * 35
+     * 20
+     * 15
+     * 25
+     * 47
+     * 40
+     * 62
+     * 55
+     * 65
+     * 95
+     * 102
+     * 117
+     * 150
+     * 182
+     * 127
+     * 219
+     * 299
+     * 277
+     * 309
+     * 576
+     * </pre>
+     * In this list, adding up all of the numbers from 15 through 40 produces the invalid number from step 1, 127. (Of
+     * course, the contiguous set of numbers in your actual list might be much longer.)
+     * <p/>
+     * To find the encryption weakness, add together the smallest and largest number in this contiguous range; in this
+     * example, these are 15 and 47, producing 62.
+     * <p/>
+     * What is the encryption weakness in your XMAS-encrypted list of numbers?
+     *
+     * @param lines         encrypted data
+     * @param invalidNumber XMAS weakness
+     * @return sum of the smallest and largest numbers of the numbers that added together sum up to invalidNumber
+     */
+    final long second(final List<String> lines, final long invalidNumber) {
+        final List<Long> numbers = lines.stream().map(Long::parseLong).collect(Collectors.toList());
+
+        for (int i = 0; i < numbers.size() - 1; i++) {
+            final List<Long> sumNumbers = new ArrayList<>();
+            sumNumbers.add(numbers.get(i));
+
+            for (int j = i + 1; j < numbers.size(); j++) {
+                sumNumbers.add(numbers.get(j));
+                final long sum = sumNumbers.stream().mapToLong(Long::longValue).sum();
+
+                if (sum == invalidNumber) {
+                    return Stream.concat(sumNumbers.stream().min(Long::compare).stream(),
+                                         sumNumbers.stream().max(Long::compare).stream())
+                                 .mapToLong(Long::longValue)
+                                 .sum();
+                } else if (sum > invalidNumber) {
+                    break;
+                }
+            }
+        }
+
+        throw new IllegalStateException("Numbers not found");
     }
 
 }
