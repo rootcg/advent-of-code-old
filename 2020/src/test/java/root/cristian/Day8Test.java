@@ -26,7 +26,7 @@ class Day8Test {
 
         final Day8 day8 = new Day8();
         final long result = day8.first(data.lines().collect(Collectors.toList()));
-        Assertions.assertEquals(4, result);
+        Assertions.assertEquals(5, result);
     }
 
     @Test

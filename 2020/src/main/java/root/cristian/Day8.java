@@ -1,5 +1,6 @@
 package root.cristian;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -71,7 +72,29 @@ public class Day8 {
      * @return accumulator value before starting the infinite loop
      */
     final long first(final List<String> lines) {
-        throw new IllegalStateException();
+        final List<Integer> executedActions = new ArrayList<>();
+        int pointer = 0;
+        int acc = 0;
+
+        while (!executedActions.contains(pointer)) {
+            executedActions.add(pointer);
+
+            final String[] codeLine = lines.get(pointer).split(" ");
+            switch (codeLine[0]) {
+                case "jmp":
+                    pointer += Integer.parseInt(codeLine[1]);
+                    break;
+                case "acc":
+                    acc += Integer.parseInt(codeLine[1]);
+                case "nop":
+                    pointer++;
+                    break;
+                default:
+                    throw new IllegalStateException("Unknown operation");
+            }
+        }
+
+        return acc;
     }
 
     final long second(final List<String> lines) {
