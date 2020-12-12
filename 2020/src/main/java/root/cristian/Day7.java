@@ -4,13 +4,17 @@ import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
  * --- Day 7: Handy Haversacks ---
  */
 public class Day7 {
+
+    private static final Pattern LUGGAGE_RULE_PATTERN = Pattern.compile("(\\d)?\\s?([a-zA-Z\\s]*)\\sbags?");
 
     /**
      * You land at the regional airport in time for your next flight. In fact, it looks like you'll even have time to
@@ -55,7 +59,6 @@ public class Day7 {
      * @return number of bags can hold the shiny gold one
      */
     final long first(final List<String> lines) {
-        final Pattern luggageRuleRegex = Pattern.compile("(\\d)?\\s?([a-zA-Z\\s]*)\\sbags?");
         final BiConsumer<Map<String, Set<String>>, Matcher> luggageAccumulator = (map, matcher) -> {
             String container =
                     Optional.of(matcher.find())
@@ -75,23 +78,38 @@ public class Day7 {
 
         final Map<String, Set<String>> bags =
                 lines.stream()
-                     .map(luggageRuleRegex::matcher)
+                     .map(LUGGAGE_RULE_PATTERN::matcher)
                      .collect(HashMap::new, luggageAccumulator, Map::putAll);
 
-        return recursiveLookup("shiny gold", bags).size();
+        return recursiveLookup("shiny gold", bags, Collectors.toSet()).size();
     }
 
     final long second(final List<String> lines) {
-        throw new IllegalStateException("Not implemented");
+        final Map<String, List<String>> bags =
+                lines.stream()
+                     .map(LUGGAGE_RULE_PATTERN::matcher)
+                     .collect(Collectors.toMap(
+                             matcher -> Optional.of(matcher.find())
+                                                .filter(Boolean.TRUE::equals)
+                                                .map(ignore -> matcher.group(2))
+                                                .orElseThrow(IllegalStateException::new),
+                             matcher -> matcher.results()
+                                               .flatMap(match -> IntStream.range(0, Integer.parseInt(match.group(1)))
+                                                                          .mapToObj(i -> match.group(2)))
+                                               .collect(Collectors.toList())));
+
+        return recursiveLookup("shiny gold", bags, Collectors.toList()).size();
     }
 
-    private Set<String> recursiveLookup(final String target, final Map<String, Set<String>> bags) {
-        final Set<String> containers = bags.getOrDefault(target, new HashSet<>());
+    private Collection<String> recursiveLookup(final String target,
+                                        final Map<String, ? extends Collection<String>> bags,
+                                        final Collector<String, ?, ? extends Collection<String>> collector) {
+        final Collection<String> containers = bags.get(target) == null ? Collections.emptyList() : bags.get(target);
         return Stream.concat(containers.stream(),
                              containers.stream()
-                                       .map(container -> recursiveLookup(container, bags))
-                                       .flatMap(Set::stream))
-                     .collect(Collectors.toSet());
+                                       .map(container -> recursiveLookup(container, bags, collector))
+                                       .flatMap(Collection::stream))
+                     .collect(collector);
     }
 
 }
