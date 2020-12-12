@@ -2,11 +2,18 @@ package root.cristian;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * --- Day 8: Handheld Halting ---
  */
 public class Day8 {
+
+    private static final record Operation(String command, int argument) {}
+
+    private static final record BootResult(int acc, boolean graceful) {}
 
     /**
      * Your flight to the major airline hub reaches cruising altitude without incident. While you consider checking the
@@ -72,20 +79,111 @@ public class Day8 {
      * @return accumulator value before starting the infinite loop
      */
     final long first(final List<String> lines) {
+        final List<Operation> operations =
+                lines.stream()
+                     .map(line -> line.split(" "))
+                     .map(rawOperation -> new Operation(rawOperation[0], Integer.parseInt(rawOperation[1])))
+                     .collect(Collectors.toList());
+
+        return boot(operations).acc;
+    }
+
+    /**
+     * After some careful analysis, you believe that exactly one instruction is corrupted.
+     * <p/>
+     * Somewhere in the program, either a jmp is supposed to be a nop, or a nop is supposed to be a jmp. (No acc
+     * instructions were harmed in the corruption of this boot code.)
+     * <p/>
+     * The program is supposed to terminate by attempting to execute an instruction immediately after the last
+     * instruction in the file. By changing exactly one jmp or nop, you can repair the boot code and make it terminate
+     * correctly.
+     * <p/>
+     * For example, consider the same program from above:
+     * <pre>
+     * nop +0
+     * acc +1
+     * jmp +4
+     * acc +3
+     * jmp -3
+     * acc -99
+     * acc +1
+     * jmp -4
+     * acc +6
+     * </pre>
+     * If you change the first instruction from nop +0 to jmp +0, it would create a single-instruction infinite loop,
+     * never leaving that instruction. If you change almost any of the jmp instructions, the program will still
+     * eventually find another jmp instruction and loop forever.
+     * <p/>
+     * However, if you change the second-to-last instruction (from jmp -4 to nop -4), the program terminates! The
+     * instructions are visited in this order:
+     * <pre>
+     * nop +0  | 1
+     * acc +1  | 2
+     * jmp +4  | 3
+     * acc +3  |
+     * jmp -3  |
+     * acc -99 |
+     * acc +1  | 4
+     * nop -4  | 5
+     * acc +6  | 6
+     *  </pre>
+     * After the last instruction (acc +6), the program terminates by attempting to run the instruction below the last
+     * instruction in the file. With this change, after the program terminates, the accumulator contains the value 8
+     * (acc +1, acc +1, acc +6).
+     * <p/>
+     * Fix the program so that it terminates normally by changing exactly one jmp (to nop) or nop (to jmp). What is the
+     * value of the accumulator after the program terminates?
+     *
+     * @param lines boot commands
+     * @return accumulator value after the program exit
+     */
+    final long second(final List<String> lines) {
+        final List<Operation> operations =
+                lines.stream()
+                     .map(line -> line.split(" "))
+                     .map(rawOperation -> new Operation(rawOperation[0], Integer.parseInt(rawOperation[1])))
+                     .collect(Collectors.toList());
+
+        final Function<Operation, Operation> changeOperation = (operation) -> switch (operation.command) {
+            case "nop" -> new Operation("jmp", operation.argument);
+            case "jmp" -> new Operation("nop", operation.argument);
+            default -> throw new IllegalStateException("Illegal operation change");
+        };
+
+        BootResult bootResult;
+        int offset = -1;
+        do {
+            offset = IntStream.range(offset + 1, lines.size())
+                              .filter(i -> operations.get(i).command.equals("jmp") || operations.get(i).command.equals("nop"))
+                              .findFirst()
+                              .orElseThrow(IllegalStateException::new);
+
+            final List<Operation> operationsCopy = new ArrayList<>(operations);
+            operationsCopy.add(offset, changeOperation.apply(operationsCopy.remove(offset)));
+
+            bootResult = boot(operationsCopy);
+        } while (!bootResult.graceful);
+
+        return bootResult.acc;
+    }
+
+    private BootResult boot(final List<Operation> operations) {
         final List<Integer> executedActions = new ArrayList<>();
         int pointer = 0;
         int acc = 0;
+        boolean finished = false;
 
-        while (!executedActions.contains(pointer)) {
+        while (pointer >= 0 && pointer < operations.size() && !executedActions.contains(pointer) && !finished) {
             executedActions.add(pointer);
+            finished = (pointer == operations.size() - 1);
 
-            final String[] codeLine = lines.get(pointer).split(" ");
-            switch (codeLine[0]) {
+            final Operation operation = operations.get(pointer);
+            switch (operation.command) {
                 case "jmp":
-                    pointer += Integer.parseInt(codeLine[1]);
+                    pointer += operation.argument;
                     break;
                 case "acc":
-                    acc += Integer.parseInt(codeLine[1]);
+                    acc += operation.argument;
                 case "nop":
                     pointer++;
                     break;
@@ -94,11 +192,7 @@ public class Day8 {
             }
         }
 
-        return acc;
-    }
-
-    final long second(final List<String> lines) {
-        throw new IllegalStateException();
+        return new BootResult(acc, finished);
     }
 
 }

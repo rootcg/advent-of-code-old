@@ -31,7 +31,20 @@ class Day8Test {
 
     @Test
     final void exampleSecond() {
+        final String data = """
+                nop +0
+                acc +1
+                jmp +4
+                acc +3
+                jmp -3
+                acc -99
+                acc +1
+                jmp -4
+                acc +6""";
 
+        final Day8 day8 = new Day8();
+        final long result = day8.second(data.lines().collect(Collectors.toList()));
+        Assertions.assertEquals(8, result);
     }
 
     @Test
@@ -44,7 +57,10 @@ class Day8Test {
 
     @Test
     final void second() throws IOException {
-
+        final List<String> data = readInput();
+        final Day8 day8 = new Day8();
+        final long result = day8.second(data);
+        System.out.println("Result is: " + result);
     }
 
     private List<String> readInput() throws IOException {
