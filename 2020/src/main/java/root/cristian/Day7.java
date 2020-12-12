@@ -1,6 +1,11 @@
 package root.cristian;
 
-import java.util.List;
+import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * --- Day 7: Handy Haversacks ---
@@ -50,11 +55,43 @@ public class Day7 {
      * @return number of bags can hold the shiny gold one
      */
     final long first(final List<String> lines) {
-        throw new IllegalStateException("Not implemented");
+        final Pattern luggageRuleRegex = Pattern.compile("(\\d)?\\s?([a-zA-Z\\s]*)\\sbags?");
+        final BiConsumer<Map<String, Set<String>>, Matcher> luggageAccumulator = (map, matcher) -> {
+            String container =
+                    Optional.of(matcher.find())
+                            .filter(Boolean.TRUE::equals)
+                            .map(ignore -> matcher.group(2))
+                            .orElseThrow(IllegalStateException::new);
+
+            matcher.results()
+                   .map(bags -> bags.group(2))
+                   .forEach(bag -> map.compute(bag,
+                                               (ignore, containers) -> {
+                                                   containers = containers == null ? new HashSet<>() : containers;
+                                                   containers.add(container);
+                                                   return containers;
+                                               }));
+        };
+
+        final Map<String, Set<String>> bags =
+                lines.stream()
+                     .map(luggageRuleRegex::matcher)
+                     .collect(HashMap::new, luggageAccumulator, Map::putAll);
+
+        return recursiveLookup("shiny gold", bags).size();
     }
 
     final long second(final List<String> lines) {
         throw new IllegalStateException("Not implemented");
+    }
+
+    private Set<String> recursiveLookup(final String target, final Map<String, Set<String>> bags) {
+        final Set<String> containers = bags.getOrDefault(target, new HashSet<>());
+        return Stream.concat(containers.stream(),
+                             containers.stream()
+                                       .map(container -> recursiveLookup(container, bags))
+                                       .flatMap(Set::stream))
+                     .collect(Collectors.toSet());
     }
 
 }
