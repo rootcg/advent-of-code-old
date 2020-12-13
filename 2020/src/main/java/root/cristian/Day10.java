@@ -1,7 +1,10 @@
 package root.cristian;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -110,7 +113,7 @@ public class Day10 {
      * count the joltage differences between the charging outlet, the adapters, and your device. What is the number of
      * 1-jolt differences multiplied by the number of 3-jolt differences?
      *
-     * @param lines charger jolts
+     * @param lines adapters jolts
      * @return product of 1-jolt differences and 3-jolt differences
      */
     final long first(final List<String> lines) {
@@ -121,11 +124,12 @@ public class Day10 {
 
         long oneJoltDifferences = adapters.get(adapters.size() - 1); // first adapter to plug-in
         long threeJoltDifferences = 1; // because built in adapter
+
         for (int i = 0; i < adapters.size() - 1; i++) {
             final long diff = adapters.get(i) - adapters.get(i + 1);
-            if(diff == 1) {
+            if (diff == 1) {
                 oneJoltDifferences++;
-            } else if(diff == 3) {
+            } else if (diff == 3) {
                 threeJoltDifferences++;
             }
         }
@@ -133,8 +137,182 @@ public class Day10 {
         return oneJoltDifferences * threeJoltDifferences;
     }
 
+    /**
+     * To completely determine whether you have enough adapters, you'll need to figure out how many different ways they
+     * can be arranged. Every arrangement needs to connect the charging outlet to your device. The previous rules about
+     * when adapters can successfully connect still apply.
+     * <p/>
+     * The first example above (the one that starts with 16, 10, 15) supports the following arrangements:
+     * <pre>
+     * (0), 1, 4, 5, 6, 7, 10, 11, 12, 15, 16, 19, (22)
+     * (0), 1, 4, 5, 6, 7, 10, 12, 15, 16, 19, (22)
+     * (0), 1, 4, 5, 7, 10, 11, 12, 15, 16, 19, (22)
+     * (0), 1, 4, 5, 7, 10, 12, 15, 16, 19, (22)
+     * (0), 1, 4, 6, 7, 10, 11, 12, 15, 16, 19, (22)
+     * (0), 1, 4, 6, 7, 10, 12, 15, 16, 19, (22)
+     * (0), 1, 4, 7, 10, 11, 12, 15, 16, 19, (22)
+     * (0), 1, 4, 7, 10, 12, 15, 16, 19, (22)
+     * </pre>
+     * (The charging outlet and your device's built-in adapter are shown in parentheses.) Given the adapters from the
+     * first example, the total number of arrangements that connect the charging outlet to your device is 8.
+     * <p/>
+     * The second example above (the one that starts with 28, 33, 18) has many arrangements. Here are a few:
+     * <pre>
+     * (0), 1, 2, 3, 4, 7, 8, 9, 10, 11, 14, 17, 18, 19, 20, 23, 24, 25, 28, 31, 32, 33, 34, 35, 38, 39, 42, 45, 46, 47, 48, 49, (52)
+     * (0), 1, 2, 3, 4, 7, 8, 9, 10, 11, 14, 17, 18, 19, 20, 23, 24, 25, 28, 31, 32, 33, 34, 35, 38, 39, 42, 45, 46, 47, 49, (52)
+     * (0), 1, 2, 3, 4, 7, 8, 9, 10, 11, 14, 17, 18, 19, 20, 23, 24, 25, 28, 31, 32, 33, 34, 35, 38, 39, 42, 45, 46, 48, 49, (52)
+     * (0), 1, 2, 3, 4, 7, 8, 9, 10, 11, 14, 17, 18, 19, 20, 23, 24, 25, 28, 31, 32, 33, 34, 35, 38, 39, 42, 45, 46, 49, (52)
+     * (0), 1, 2, 3, 4, 7, 8, 9, 10, 11, 14, 17, 18, 19, 20, 23, 24, 25, 28, 31, 32, 33, 34, 35, 38, 39, 42, 45, 47, 48, 49, (52)
+     * (0), 3, 4, 7, 10, 11, 14, 17, 20, 23, 25, 28, 31, 34, 35, 38, 39, 42, 45, 46, 48, 49, (52)
+     * (0), 3, 4, 7, 10, 11, 14, 17, 20, 23, 25, 28, 31, 34, 35, 38, 39, 42, 45, 46, 49, (52)
+     * (0), 3, 4, 7, 10, 11, 14, 17, 20, 23, 25, 28, 31, 34, 35, 38, 39, 42, 45, 47, 48, 49, (52)
+     * (0), 3, 4, 7, 10, 11, 14, 17, 20, 23, 25, 28, 31, 34, 35, 38, 39, 42, 45, 47, 49, (52)
+     * (0), 3, 4, 7, 10, 11, 14, 17, 20, 23, 25, 28, 31, 34, 35, 38, 39, 42, 45, 48, 49, (52)
+     * </pre>
+     * In total, this set of adapters can connect the charging outlet to your device in 19208 distinct arrangements.
+     * <p/>
+     * You glance back down at your bag and try to remember why you brought so many adapters; there must be more than a
+     * trillion valid ways to arrange them! Surely, there must be an efficient way to count the arrangements.
+     * <p/>
+     * What is the total number of distinct ways you can arrange the adapters to connect the charging outlet to your
+     * device?
+     *
+     * @param lines adapters jolts
+     * @return the number of distinct ways the adapters can be arranged
+     */
     final long second(final List<String> lines) {
-        throw new IllegalStateException();
+        final List<Long> adapters = lines.stream()
+                                         .map(Long::valueOf)
+                                         .sorted(Comparator.comparingLong(Long::longValue))
+                                         .collect(Collectors.toList());
+
+        // Last and first adapters
+        adapters.add(0, 0L);
+        adapters.add(adapters.get(adapters.size() - 1) + 3);
+
+        return withDiffs(adapters.stream().mapToLong(Long::longValue).toArray());
+    }
+
+    private long countArrangements(final List<Long> adaptersBag, final LinkedList<Long> plugedAdapters) {
+        final List<Long> candidates = adaptersBag.stream()
+                                                 .filter(adapter -> adapter <= plugedAdapters.getLast() + 3)
+                                                 .collect(Collectors.toList());
+
+        if (candidates.isEmpty()) {
+            return 1;
+        }
+
+        int arrangements = 0;
+        for (Long candidate : candidates) {
+            final List<Long> bagCopy = new ArrayList<>(adaptersBag);
+            bagCopy.removeIf(adapter -> adapter <= candidate);
+
+            final LinkedList<Long> pluggedAdaptersCopy = new LinkedList<>(adaptersBag);
+            pluggedAdaptersCopy.add(candidate);
+
+            arrangements += countArrangements(bagCopy, pluggedAdaptersCopy);
+        }
+
+        return arrangements;
+    }
+
+    private long countArrangementsEfficiently(final long[] adapters, final int pointer, final long lastAdapter) {
+        if (pointer >= adapters.length - 1) {
+            return 1;
+        }
+
+        long arrangements = 0;
+        for (int i = pointer; i < adapters.length - 1; i++) {
+            if (adapters[i] <= lastAdapter + 3) {
+                arrangements += countArrangementsEfficiently(adapters, i + 1, adapters[i]);
+            }
+        }
+
+        return arrangements;
+    }
+
+    private long mathMagic(final long[] adapters) {
+        final Function<Integer, Integer> cantidatesToArrangements = (candidates) -> switch (candidates) {
+            case 3 -> 4;
+            case 2 -> 2;
+            case 0, 1 -> 1;
+            default -> throw new IllegalStateException("Illegal number of candidates");
+        };
+
+        long arrangements = 0;
+        int i = 0;
+        while (i < adapters.length - 1) {
+            int candidates = 0;
+            int j = i + 1;
+            while (j < adapters.length && candidates < 3 && adapters[j] <= adapters[i] + 3) {
+                candidates++;
+                j++;
+            }
+            arrangements *= cantidatesToArrangements.apply(candidates);
+            i += candidates;
+        }
+
+        return arrangements;
+    }
+
+    private long withDiffs(final long[] adapters) {
+        final long[] diffs = new long[adapters.length - 1];
+        for (int i = 0; i < adapters.length - 1; i++) {
+            final long diff = adapters[i + 1] - adapters[i];
+            diffs[i] = diff;
+        }
+
+        // (0) 1 4 5 6 7 10 11 12 15 16 19 (22)
+        /*
+        1
+        4
+        5      6    7
+        6   7  7    10
+        7  10  10
+        10
+         */
+
+        long acc = 0;
+        int auxAcc = 0;
+        int count = 0;
+
+        for (long diff : diffs) {
+            if (diff + auxAcc > 3) {
+                acc += findPermutations(count);
+                count = 0;
+                auxAcc = 0;
+            }
+
+            count++;
+            auxAcc += diff;
+        }
+
+        return acc;
+    }
+
+    // Function to find the number
+    // of permutations possible
+    // for a given String
+    private static long permute(int n, int r) {
+        long ans = 0;
+        ans = (factorial(n) / factorial(n - r));
+        return ans;
+    }
+
+    // Function to find the total
+    // number of combinations possible
+    private static long findPermutations(int n) {
+        long sum = 0, P;
+        for(int r = 1; r <= n; r++) {
+            P = permute(n, r);
+            sum = sum + P;
+        }
+        return sum;
+    }
+
+    private static long factorial(int n) {
+        if(n <= 1) return 1;
+        else return factorial(n - 1) * n;
     }
 
 }
