@@ -1,10 +1,9 @@
 package root.cristian;
 
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.function.Function;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -186,133 +185,29 @@ public class Day10 {
                                          .sorted(Comparator.comparingLong(Long::longValue))
                                          .collect(Collectors.toList());
 
-        // Last and first adapters
-        adapters.add(0, 0L);
-        adapters.add(adapters.get(adapters.size() - 1) + 3);
-
-        return withDiffs(adapters.stream().mapToLong(Long::longValue).toArray());
+        return countArrangements(0, adapters, new HashMap<>());
     }
 
-    private long countArrangements(final List<Long> adaptersBag, final LinkedList<Long> plugedAdapters) {
+    private long countArrangements(final long currentAdapter, final List<Long> adaptersBag, final Map<Long, Long> cache) {
         final List<Long> candidates = adaptersBag.stream()
-                                                 .filter(adapter -> adapter <= plugedAdapters.getLast() + 3)
+                                                 .filter(adapter -> adapter <= currentAdapter + 3)
                                                  .collect(Collectors.toList());
 
         if (candidates.isEmpty()) {
             return 1;
         }
 
-        int arrangements = 0;
         for (Long candidate : candidates) {
-            final List<Long> bagCopy = new ArrayList<>(adaptersBag);
-            bagCopy.removeIf(adapter -> adapter <= candidate);
+            long candidateArrangements = cache.get(candidate) != null
+                    ? cache.get(candidate)
+                    : countArrangements(candidate, adaptersBag.stream()
+                                                              .filter(a -> a > candidate)
+                                                              .collect(Collectors.toList()), cache);
 
-            final LinkedList<Long> pluggedAdaptersCopy = new LinkedList<>(adaptersBag);
-            pluggedAdaptersCopy.add(candidate);
-
-            arrangements += countArrangements(bagCopy, pluggedAdaptersCopy);
+            cache.put(currentAdapter, cache.getOrDefault(currentAdapter, 0L) + candidateArrangements);
         }
 
-        return arrangements;
-    }
-
-    private long countArrangementsEfficiently(final long[] adapters, final int pointer, final long lastAdapter) {
-        if (pointer >= adapters.length - 1) {
-            return 1;
-        }
-
-        long arrangements = 0;
-        for (int i = pointer; i < adapters.length - 1; i++) {
-            if (adapters[i] <= lastAdapter + 3) {
-                arrangements += countArrangementsEfficiently(adapters, i + 1, adapters[i]);
-            }
-        }
-
-        return arrangements;
-    }
-
-    private long mathMagic(final long[] adapters) {
-        final Function<Integer, Integer> cantidatesToArrangements = (candidates) -> switch (candidates) {
-            case 3 -> 4;
-            case 2 -> 2;
-            case 0, 1 -> 1;
-            default -> throw new IllegalStateException("Illegal number of candidates");
-        };
-
-        long arrangements = 0;
-        int i = 0;
-        while (i < adapters.length - 1) {
-            int candidates = 0;
-            int j = i + 1;
-            while (j < adapters.length && candidates < 3 && adapters[j] <= adapters[i] + 3) {
-                candidates++;
-                j++;
-            }
-            arrangements *= cantidatesToArrangements.apply(candidates);
-            i += candidates;
-        }
-
-        return arrangements;
-    }
-
-    private long withDiffs(final long[] adapters) {
-        final long[] diffs = new long[adapters.length - 1];
-        for (int i = 0; i < adapters.length - 1; i++) {
-            final long diff = adapters[i + 1] - adapters[i];
-            diffs[i] = diff;
-        }
-
-        // (0) 1 4 5 6 7 10 11 12 15 16 19 (22)
-        /*
-        1
-        4
-        5      6    7
-        6   7  7    10
-        7  10  10
-        10
-         */
-
-        long acc = 0;
-        int auxAcc = 0;
-        int count = 0;
-
-        for (long diff : diffs) {
-            if (diff + auxAcc > 3) {
-                acc += findPermutations(count);
-                count = 0;
-                auxAcc = 0;
-            }
-
-            count++;
-            auxAcc += diff;
-        }
-
-        return acc;
-    }
-
-    // Function to find the number
-    // of permutations possible
-    // for a given String
-    private static long permute(int n, int r) {
-        long ans = 0;
-        ans = (factorial(n) / factorial(n - r));
-        return ans;
-    }
-
-    // Function to find the total
-    // number of combinations possible
-    private static long findPermutations(int n) {
-        long sum = 0, P;
-        for(int r = 1; r <= n; r++) {
-            P = permute(n, r);
-            sum = sum + P;
-        }
-        return sum;
-    }
-
-    private static long factorial(int n) {
-        if(n <= 1) return 1;
-        else return factorial(n - 1) * n;
+        return cache.get(currentAdapter);
     }
 
 }

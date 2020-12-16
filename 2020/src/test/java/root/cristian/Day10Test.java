@@ -81,8 +81,8 @@ class Day10Test {
 
         final Day10 day10 = new Day10();
         Assertions.assertAll(
-                () -> Assertions.assertEquals(8, day10.second(smallSample.lines().collect(Collectors.toList())))
-//                () -> Assertions.assertEquals(19208, day10.second(bigSample.lines().collect(Collectors.toList())))
+                () -> Assertions.assertEquals(8, day10.second(smallSample.lines().collect(Collectors.toList()))),
+                () -> Assertions.assertEquals(19208, day10.second(bigSample.lines().collect(Collectors.toList())))
         );
     }
 
