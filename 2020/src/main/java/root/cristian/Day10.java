@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * --- Day 9: Adapter Array ---
+ * --- Day 10: Adapter Array ---
  */
 public class Day10 {
 
