@@ -32,7 +32,21 @@ class Day11Test {
 
     @Test
     final void exampleSecond() {
+        final String data = """
+                L.LL.LL.LL
+                LLLLLLL.LL
+                L.L.L..L..
+                LLLL.LL.LL
+                L.LL.LL.LL
+                L.LLLLL.LL
+                ..L.L.....
+                LLLLLLLLLL
+                L.LLLLLL.L
+                L.LLLLL.LL""";
 
+        final Day11 day11 = new Day11();
+        final long result = day11.second(data.lines().collect(Collectors.toList()));
+        Assertions.assertEquals(26, result);
     }
 
     @Test
